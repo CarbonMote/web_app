@@ -1,15 +1,32 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAccount, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { ADAPTER_EVENTS, SafeEventEmitterProvider } from "@web3auth/base";
 import getSafeAuth from "@/utils/safeAuth";
 import { Loader2 } from "lucide-react";
-import { contractAddresses, contractAbi } from "@/constants/index";
 import { connectedHandler, disconnectedHandler } from "@/constants/index";
 import { ethers } from "ethers";
+import TokenMint from "@/components/TokenMint";
+
+// Dummy component for the Safe
+const SafeComponent = () => {
+  return {
+    safeAddress: "your-safe-address"
+  };
+};
+
+// Dummy data for balances
+const dummyBalances = [
+  { asset: "Asset 1", balance: 100 },
+  { asset: "Asset 2", balance: 200 }
+];
+
+// Dummy handleTransfer function
+const dummyHandleTransfer = () => {
+  // Your transfer logic here
+};
 
 export default function Home() {
   const [loading, setLoading] = useState({
@@ -19,7 +36,6 @@ export default function Home() {
   // const { address, isConnected } = useAccount();
   const [eoaAddress, setEoaAddress] = useState(null);
   const [safeAuth, setSafeAuth] = useState();
-  const router = useRouter();
 
   const { connect } = useConnect({
     connector: new InjectedConnector()
@@ -41,16 +57,6 @@ export default function Home() {
     })();
   }, []);
 
-  //Get Safe address or create it it doesn't exist
-  const performSafeCheck = async () => {
-    const safeAddress = ""; //await getSafeAddressFromContract();
-    const emptyAddress = /^0x0+$/.test(safeAddress);
-
-    if (emptyAddress) {
-      console.log();
-    }
-  };
-
   const safeAuthLogin = async () => {
     if (!safeAuth) return;
     setLoading(prev => ({ ...prev, web2: true }));
@@ -60,7 +66,6 @@ export default function Home() {
 
     setLoading(prev => ({ ...prev, web2: false }));
     await setEoaAddress(response.eoa);
-    await performRedirect();
   };
   const safeAuthLogout = async () => {
     if (!safeAuth) return;
@@ -112,6 +117,7 @@ export default function Home() {
         )}
         {eoaAddress && <p>EOA: {eoaAddress}</p>}
       </div>
+      {eoaAddress && <TokenMint safe={SafeComponent()} balances={dummyBalances} handleTransfer={dummyHandleTransfer} />}
     </main>
   );
 }
