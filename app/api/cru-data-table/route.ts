@@ -40,3 +40,24 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
+
+export async function PUT(req: NextRequest) {
+	try {
+		const body = await req.json();
+		const { id, distance, BufferedCredits, TotalCredits } = body;
+		const result = await sql`
+					UPDATE "User"
+					SET distance = ${distance}, BufferedCredits = ${BufferedCredits}, TotalCredits = ${TotalCredits}
+					WHERE id = ${id}
+					RETURNING *;
+			`;
+		const data = result.rows[0];
+		return NextResponse.json({ data, status: 200 });
+	} catch (err) {
+		console.log("Error: " + err);
+		return NextResponse.json(
+			{ error: "An error occurred while updating the record." },
+			{ status: 500 }
+		);
+	}
+}
