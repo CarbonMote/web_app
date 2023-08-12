@@ -10,24 +10,6 @@ import { connectedHandler, disconnectedHandler } from "@/constants/index";
 import { ethers } from "ethers";
 import TokenMint from "@/components/TokenMint";
 
-// Dummy component for the Safe
-const SafeComponent = () => {
-  return {
-    safeAddress: "your-safe-address"
-  };
-};
-
-// Dummy data for balances
-const dummyBalances = [
-  { asset: "Asset 1", balance: 100 },
-  { asset: "Asset 2", balance: 200 }
-];
-
-// Dummy handleTransfer function
-const dummyHandleTransfer = () => {
-  // Your transfer logic here
-};
-
 export default function Home() {
   const [loading, setLoading] = useState({
     web3: false,
@@ -36,6 +18,8 @@ export default function Home() {
   // const { address, isConnected } = useAccount();
   const [eoaAddress, setEoaAddress] = useState(null);
   const [safeAuth, setSafeAuth] = useState();
+  const [provider, setProvider] = useState();
+  const [dbdata, setdbdata] = useState([]);
 
   const { connect } = useConnect({
     connector: new InjectedConnector()
@@ -49,12 +33,25 @@ export default function Home() {
       safeAuthKit.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
 
       setSafeAuth(safeAuthKit);
+      //set provider
+      const prov = new ethers.providers.Web3Provider(safeAuthKit.getProvider());
+      setProvider(prov);
 
       return () => {
         safeAuthKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
         safeAuthKit.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
       };
     })();
+
+    // Fetch data from the "GET" endpoint
+    fetch("/api/cru-data-table")
+      .then(response => response.json())
+      .then(data => {
+        setdbdata(data);
+      })
+      .catch(error => {
+        console.error("Error fetching data:", error);
+      });
   }, []);
 
   const safeAuthLogin = async () => {
@@ -63,6 +60,10 @@ export default function Home() {
 
     //Try to login
     const response = await safeAuth.signIn();
+
+    //set provider
+    const prov = new ethers.providers.Web3Provider(safeAuth.getProvider());
+    setProvider(prov);
 
     setLoading(prev => ({ ...prev, web2: false }));
     await setEoaAddress(response.eoa);
@@ -117,7 +118,19 @@ export default function Home() {
         )}
         {eoaAddress && <p>EOA: {eoaAddress}</p>}
       </div>
-      {eoaAddress && <TokenMint safe={SafeComponent()} balances={dummyBalances} handleTransfer={dummyHandleTransfer} />}
+      {eoaAddress && (
+        <TokenMint
+          userWalletAddress={eoaAddress}
+          signer={provider.getSigner()}
+          balances={[
+            { asset: "Distance Walked (km)", balance: dbdata.distance },
+            { asset: "Biking Distance (km)", balance: 10 },
+            { asset: "Solar Power Produced (kW)", balance: 60 },
+            { asset: "Car Driven (km)", balance: 103 },
+            { asset: "Credits Availble to Mint", balance: dbdata.bufferedcredits }
+          ]}
+        />
+      )}
     </main>
   );
 }

@@ -10,8 +10,8 @@ const getSafeAuth = async () => {
 		web3AuthNetwork: "testnet",
 		chainConfig: {
 			chainNamespace: CHAIN_NAMESPACES.EIP155,
-			chainId: "0x5",
-			rpcTarget: process.env.NEXT_PUBLIC_INFURA_RPC_TARGET,
+			chainId: "0x14a33", //"0x5",
+			rpcTarget: "https://goerli.base.org", //process.env.NEXT_PUBLIC_INFURA_RPC_TARGET,
 		},
 		uiConfig: {
 			theme: "dark",
@@ -50,7 +50,7 @@ const getSafeAuth = async () => {
 	);
 
 	const safeAuthKit = await SafeAuthKit.init(adapter, {
-		txServiceUrl: "https://safe-transaction-goerli.safe.global",
+		txServiceUrl: "https://safe-transaction-base-testnet.safe.global/", //"https://safe-transaction-goerli.safe.global",
 	});
 
 	return safeAuthKit;

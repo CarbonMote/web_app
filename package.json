@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ethereum-attestation-service/eas-sdk": "^1.1.0-beta.1",
     "@gelatonetwork/relay-sdk": "^4.0.0",
     "@monerium/sdk": "^2.4.1",
     "@radix-ui/react-label": "^2.0.1",
