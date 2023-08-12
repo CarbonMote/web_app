@@ -14,9 +14,9 @@ export default async function handler(
 				let query;
 
 				if (id) {
-					query = sql`SELECT * FROM user WHERE id = ${Number(id)}`;
+					query = sql`SELECT * FROM "User" WHERE id = ${Number(id)}`;
 				} else {
-					query = sql`SELECT * FROM user`;
+					query = sql`SELECT * FROM "User"`;
 				}
 
 				const data = await query;
@@ -31,7 +31,7 @@ export default async function handler(
 			try {
 				const { distance, BufferedCredits, TotalCredits } = req.body;
 				const result = await sql`
-                    INSERT INTO user (distance, BufferedCredits, TotalCredits)
+                    INSERT INTO "User" (distance, BufferedCredits, TotalCredits)
                     VALUES (${distance}, ${BufferedCredits}, ${TotalCredits})
                     RETURNING *;
                 `;
