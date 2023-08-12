@@ -41,6 +41,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 		// Add cases for PUT (Update) and DELETE operations here
 		default:
 			res.setHeader("Allow", ["GET", "POST"]);
+			console.log(`Method ${method} Not Allowed`);
 			return res.status(405).end(`Method ${method} Not Allowed`);
 	}
 }
