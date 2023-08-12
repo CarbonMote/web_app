@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ClientOnly from "@/components/clientOnly";
-import CreateSafe from "@/components/CreateSafe";
 
 export default function SafePage() {
   const [hasMounted, setHasMounted] = useState(false);
@@ -14,8 +12,9 @@ export default function SafePage() {
   if (!hasMounted) return null;
 
   return (
-    <ClientOnly>
-      <CreateSafe />
-    </ClientOnly>
+    <></>
+    // <ClientOnly>
+    //   <CreateSafe />
+    // </ClientOnly>
   );
 }
