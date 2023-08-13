@@ -21,9 +21,22 @@ export default function Home() {
   const [provider, setProvider] = useState();
   const [dbdata, setdbdata] = useState([]);
 
-  // const { connect } = useConnect({
-  // 	connector: new InjectedConnector()
-  // });
+  const getTokens = `
+    query {
+      tokens(where: { tokenURI: "4444" }) {
+        id
+        tokenId
+        tokenURI
+      }
+    }
+  `;
+
+  const { isloading, error, data } = useQuery(getTokens, { client });
+  useEffect(() => {
+    if (!isloading && data) {
+      console.log(data);
+    }
+  }, [loading, data]);
 
   useEffect(() => {
     // Fetch data from the "GET" endpoint
