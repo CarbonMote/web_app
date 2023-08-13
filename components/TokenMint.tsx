@@ -6,7 +6,7 @@ import {
 	SafeTransaction,
 	SafeTransactionDataPartial,
 } from "@safe-global/safe-core-sdk-types";
-import Safe from "@safe-global/protocol-kit";
+// import Safe from "@safe-global/protocol-kit";
 import EASHandler from "@/utils/EASHandler";
 // import { SafeAuthKit, Web3AuthModalPack } from "@/utils/safe-core";
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";

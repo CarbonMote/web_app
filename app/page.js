@@ -9,6 +9,8 @@ import { ethers } from "ethers";
 import TokenMint from "@/components/TokenMint";
 import AuthKitClass from "@/utils/safeAuth";
 import { ConnectKitButton } from "connectkit";
+import { useQuery, gql } from "@apollo/client";
+import client from "@/utils/ApolloClient";
 
 export default function Home() {
   const [loading, setLoading] = useState({
@@ -21,7 +23,7 @@ export default function Home() {
   const [provider, setProvider] = useState();
   const [dbdata, setdbdata] = useState([]);
 
-  const getTokens = `
+  const getTokens = gql`
     query {
       tokens(where: { tokenURI: "4444" }) {
         id
@@ -36,7 +38,7 @@ export default function Home() {
     if (!isloading && data) {
       console.log(data);
     }
-  }, [loading, data]);
+  }, [isloading, data]);
 
   useEffect(() => {
     // Fetch data from the "GET" endpoint
