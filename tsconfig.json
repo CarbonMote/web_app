@@ -2,29 +2,15 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/components/*": [
-        "components/*"
-      ],
-      "@/utils/*": [
-        "utils/*"
-      ],
-      "@/styles/*": [
-        "styles/*"
-      ],
-      "@/constants/*": [
-        "constants/*"
-      ],
-      "@/contexts/*": [
-        "contexts/*"
-      ]
+      "@/components/*": ["components/*"],
+      "@/utils/*": ["utils/*"],
+      "@/styles/*": ["styles/*"],
+      "@/constants/*": ["constants/*"],
+      "@/contexts/*": ["contexts/*"]
     },
     "allowJs": true,
     "jsx": "preserve",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "skipLibCheck": true,
     "strict": false,
     "forceConsistentCasingInFileNames": true,
@@ -42,9 +28,7 @@
     ],
     "strictNullChecks": true
   },
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",

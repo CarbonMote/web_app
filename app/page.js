@@ -4,45 +4,29 @@ import { useEffect, useState } from "react";
 import { useAccount, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { ADAPTER_EVENTS, SafeEventEmitterProvider } from "@web3auth/base";
-import getSafeAuth from "@/utils/safeAuth";
 import { Loader2 } from "lucide-react";
 import { connectedHandler, disconnectedHandler } from "@/constants/index";
 import { ethers } from "ethers";
 import TokenMint from "@/components/TokenMint";
+import AuthKitClass from "@/utils/safeAuth";
+import { ConnectKitButton } from "connectkit";
 
 export default function Home() {
   const [loading, setLoading] = useState({
     web3: false,
     web2: false
   });
-  // const { address, isConnected } = useAccount();
+  const { address, isConnecting, isDisconnected } = useAccount();
   const [eoaAddress, setEoaAddress] = useState(null);
   const [safeAuth, setSafeAuth] = useState();
   const [provider, setProvider] = useState();
   const [dbdata, setdbdata] = useState([]);
 
-  const { connect } = useConnect({
-    connector: new InjectedConnector()
-  });
+  // const { connect } = useConnect({
+  // 	connector: new InjectedConnector()
+  // });
 
   useEffect(() => {
-    (async () => {
-      const safeAuthKit = await getSafeAuth();
-
-      safeAuthKit.subscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
-      safeAuthKit.subscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
-
-      setSafeAuth(safeAuthKit);
-      //set provider
-      const prov = new ethers.providers.Web3Provider(safeAuthKit.getProvider());
-      setProvider(prov);
-
-      return () => {
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.CONNECTED, connectedHandler);
-        safeAuthKit.unsubscribe(ADAPTER_EVENTS.DISCONNECTED, disconnectedHandler);
-      };
-    })();
-
     // Fetch data from the "GET" endpoint
     fetch("/api/cru-data-table")
       .then(response => response.json())
@@ -55,18 +39,17 @@ export default function Home() {
   }, []);
 
   const safeAuthLogin = async () => {
-    if (!safeAuth) return;
     setLoading(prev => ({ ...prev, web2: true }));
 
     //Try to login
-    const response = await safeAuth.signIn();
+    const tmpSafeAuth = await AuthKitClass.createSafeAuth();
+    setSafeAuth(tmpSafeAuth);
+    console.log("login provider: " + JSON.stringify(tmpSafeAuth, null, 2));
 
-    //set provider
-    const prov = new ethers.providers.Web3Provider(safeAuth.getProvider());
-    setProvider(prov);
+    const response = await tmpSafeAuth.signIn();
+    setEoaAddress(response.eoa);
 
     setLoading(prev => ({ ...prev, web2: false }));
-    await setEoaAddress(response.eoa);
   };
   const safeAuthLogout = async () => {
     if (!safeAuth) return;
@@ -74,13 +57,8 @@ export default function Home() {
     setEoaAddress(null);
   };
 
-  const web3Login = async () => {
-    setLoading(prev => ({ ...prev, web3: true }));
-    connect();
-  };
-
   return (
-    <main className="flex flex-col items-center flex-1 px-20 text-center">
+    <div className="flex flex-col items-center flex-1 px-20 text-center">
       <div className="text-green-700 p-6">
         <p className=" text-2xl font-serif italic">
           Generate Real Carbon Credits and Begin Participating in a global carbon market
@@ -88,19 +66,7 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col w-full max-w-sm items-center">
-        {loading.web3 ? (
-          <button disabled className="w-full">
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Please wait
-          </button>
-        ) : (
-          <button
-            className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded"
-            onClick={() => web3Login()}
-          >
-            Login with Wallet
-          </button>
-        )}
+        <ConnectKitButton />
 
         <p className="mt-6 mb-3 text-sm text-muted-foreground">{"or Login Using Account Abstraction!"}</p>
         {loading.web2 ? (
@@ -118,19 +84,24 @@ export default function Home() {
         )}
         {eoaAddress && <p>EOA: {eoaAddress}</p>}
       </div>
-      {eoaAddress && (
-        <TokenMint
-          userWalletAddress={eoaAddress}
-          signer={provider.getSigner()}
-          balances={[
-            { asset: "Distance Walked (km)", balance: dbdata.distance },
-            { asset: "Biking Distance (km)", balance: 10 },
-            { asset: "Solar Power Produced (kW)", balance: 60 },
-            { asset: "Car Driven (km)", balance: 103 },
-            { asset: "Credits Availble to Mint", balance: dbdata.bufferedcredits }
-          ]}
-        />
-      )}
-    </main>
+      {eoaAddress ||
+        (address && (
+          <TokenMint
+            userWalletAddress={address}
+            // signer={safeAuth.provider.signer}
+            safeAuth={safeAuth}
+            balances={[
+              { asset: "Distance Walked (km)", balance: dbdata.distance },
+              { asset: "Biking Distance (km)", balance: 10 },
+              { asset: "Solar Power Produced (kW)", balance: 60 },
+              { asset: "Car Driven (km)", balance: 103 },
+              {
+                asset: "Credits Availble to Mint",
+                balance: dbdata.bufferedcredits
+              }
+            ]}
+          />
+        ))}
+    </div>
   );
 }
