@@ -5,7 +5,6 @@ import { useAccount, useConnect } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { ADAPTER_EVENTS, SafeEventEmitterProvider } from "@web3auth/base";
 import { Loader2 } from "lucide-react";
-import { connectedHandler, disconnectedHandler } from "@/constants/index";
 import { ethers } from "ethers";
 import TokenMint from "@/components/TokenMint";
 import AuthKitClass from "@/utils/safeAuth";

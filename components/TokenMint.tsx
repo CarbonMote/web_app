@@ -11,9 +11,8 @@ import EASHandler from "@/utils/EASHandler";
 // import { SafeAuthKit, Web3AuthModalPack } from "@/utils/safe-core";
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Web3AuthModalPack } from "@safe-global/auth-kit";
-import { MetaMaskInpageProvider } from "@metamask/providers";
 
-const CONTRACT_ADDRESS = "0xfB34915FbE18F42a311c1b3d3bBAa8037513622d";
+const CONTRACT_ADDRESS = "0x2684cF2D1cfaFbA1809C11D4225eC0B537Eba83b"; //"0xD33e55E09A4f81dD0A80dC15dae2552A0b7Ab502"; //"0xfB34915FbE18F42a311c1b3d3bBAa8037513622d";
 const contractMethod = "mint"; // The contract method you want to call
 const EASContractAddress = "0xAcfE09Fd03f7812F022FBf636700AdEA18Fd2A7A"; // Base Goerli
 const schemaUID =
@@ -89,29 +88,33 @@ export default function TokenMint({
 
 	//mint button handler
 	async function handleMint() {
-		await attestData(balances[0].balance, "iot", "today");
+		const newTokenData = await attestData(balances[0].balance, "iot", "today");
 
-		// // try {
-		// const tokensToMint = balances[4].balance; // Assuming balances[4] is the correct index
-		// // }
-		// if (window.ethereum) {
-		// 	const provider = new ethers.BrowserProvider(window.ethereum);
-		// 	const signer = await provider.getSigner();
-		// 	const contract = new ethers.Contract(
-		// 		CONTRACT_ADDRESS,
-		// 		Carbon.abi,
-		// 		signer
-		// 	);
-		// 	const mintFunction = contract["mint"];
-		// 	const toAddress = await signer.getAddress();
-		// 	const amountToMint = ethers.parseEther(tokensToMint.toString()); // Mint 1 token
-		// 	await contract.mint(toAddress, amountToMint);
-		// 	console.log("mint complete!");
-		// } else {
-		// 	console.error(
-		// 		"Ethereum provider not detected. Please make sure you have MetaMask or a similar wallet installed."
-		// 	);
+		// try {
+		const tokensToMint = balances[4].balance; // Assuming balances[4] is the correct index
 		// }
+		if (window.ethereum) {
+			const provider = new ethers.BrowserProvider(window.ethereum);
+			const signer = await provider.getSigner();
+			const contract = new ethers.Contract(
+				CONTRACT_ADDRESS,
+				Carbon.abi,
+				signer
+			);
+
+			const toAddress = await signer.getAddress();
+			// await contract.mint(toAddress, amountToMint);
+			await contract.mintTokens(
+				toAddress,
+				newTokenData,
+				tokensToMint.toString()
+			);
+			console.log("mint complete!");
+		} else {
+			console.error(
+				"Ethereum provider not detected. Please make sure you have MetaMask or a similar wallet installed."
+			);
+		}
 	}
 
 	return (
